@@ -8,7 +8,7 @@ public class StardustTests : SudokuTest
     private const int ReactionSeconds = 4;
 
     [Test]
-    public async Task StardustSpeaksWhenALevelStarts()
+    public async Task StardustSpeaksWhenTheGameOpens()
     {
         await Game.OpenAsync(new SavedGame());
 
@@ -99,4 +99,29 @@ public class StardustTests : SudokuTest
         await Expect(Page).ToHaveTitleAsync("Rainbow Kingdom Sudoku");
         await Expect(Game.Heading("Rainbow Kingdom Sudoku")).ToBeVisibleAsync();
     }
+
+    // Reloading shows the same board, so a "new puzzle" line would be untrue
+    [Test]
+    public async Task StardustWelcomesThePlayerBackToTheSameBoard()
+    {
+        await Game.OpenAsync(new SavedGame());
+
+        var welcomeBackLines = (await new StardustLines(Page).LinesInAsync("en"))["resume"];
+
+        await Expect(Game.StardustSpeech).ToHaveTextAsync(OneOf(welcomeBackLines));
+    }
+
+    [Test]
+    public async Task StardustAnnouncesANewPuzzleWhenTheNextLevelStarts()
+    {
+        await Game.OpenAsync(new SavedGame { EmptyCells = [Cell.TopLeft] });
+        await Game.EnterDigitAsync(Cell.TopLeft, SavedGame.SolutionAt(Cell.TopLeft));
+
+        await Game.Button("Next level").ClickAsync();
+
+        var startLines = (await new StardustLines(Page).LinesInAsync("en"))["start"];
+        await Expect(Game.StardustSpeech).ToHaveTextAsync(OneOf(startLines));
+    }
+
+    private static Regex OneOf(IEnumerable<string> lines) => new($"^({string.Join("|", lines.Select(Regex.Escape))})$");
 }

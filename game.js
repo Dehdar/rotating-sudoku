@@ -14,7 +14,8 @@ const LANDS = Object.freeze({
 });
 
 // One dial changes at a time: the twirl arrives on a level with the same clues as the one before,
-// and the first level on a bigger board gets plenty of clues and a slow twirl.
+// the first level on a bigger board gets plenty of clues and a slow twirl, and the last level
+// of a land is a milestone: a faster twirl on the small 4x4 board, a bigger drop in clues on 6x6.
 // twirlEvery is the number of correct digits between two twirls; null means the board stays still.
 const LEVELS = Object.freeze([
   { land: LANDS.RAINBOW_MEADOW, shape: BOARD_SHAPES.FOUR_BY_FOUR, clues: 12, twirlEvery: null },
@@ -31,7 +32,7 @@ const LEVELS = Object.freeze([
   { land: LANDS.CLOUD_CASTLE, shape: BOARD_SHAPES.SIX_BY_SIX, clues: 16, twirlEvery: 3 },
   { land: LANDS.CLOUD_CASTLE, shape: BOARD_SHAPES.SIX_BY_SIX, clues: 15, twirlEvery: 3 },
   { land: LANDS.CLOUD_CASTLE, shape: BOARD_SHAPES.SIX_BY_SIX, clues: 14, twirlEvery: 3 },
-  { land: LANDS.CLOUD_CASTLE, shape: BOARD_SHAPES.SIX_BY_SIX, clues: 14, twirlEvery: 2 },
+  { land: LANDS.CLOUD_CASTLE, shape: BOARD_SHAPES.SIX_BY_SIX, clues: 12, twirlEvery: 3 },
   { land: LANDS.STARLIGHT_PALACE, shape: BOARD_SHAPES.NINE_BY_NINE, clues: 46, twirlEvery: 6 },
   { land: LANDS.STARLIGHT_PALACE, shape: BOARD_SHAPES.NINE_BY_NINE, clues: 42, twirlEvery: 6 },
   { land: LANDS.STARLIGHT_PALACE, shape: BOARD_SHAPES.NINE_BY_NINE, clues: 38, twirlEvery: 5 },
@@ -122,7 +123,8 @@ function resumeOrStartGame() {
   }
   state = saved;
   showLevel();
-  stardust(state.status === STATUS.PLAYING ? "start" : state.status);
+  // The same board as before, so she welcomes the child back instead of announcing a new puzzle
+  stardust(state.status === STATUS.PLAYING ? "resume" : state.status);
 }
 
 // A new level may have a different board size, so the cells and number buttons are built for it
@@ -396,6 +398,7 @@ function showSweepBanner(units) {
 }
 
 function hideSweepBanner() {
+  clearTimeout(sweepBannerTimer);
   sweepBannerEl.textContent = "";
 }
 
@@ -411,6 +414,8 @@ function renderOverlay() {
   const screen = overlayScreenFor(state.status);
   overlayEl.hidden = !screen;
   if (!screen) return;
+  // A sweep from the move before the last would otherwise cover the stars
+  hideSweepBanner();
   document.getElementById("overlay-title").textContent = screen.title;
   document.getElementById("overlay-text").textContent = translate("starsText", bestStarsFor(state.level), STARS.length);
   renderStarList(bestStarsFor(state.level));
@@ -492,12 +497,15 @@ function switchLanguage() {
   createNumpadButtons();
   renderBoard();
   renderOverlay();
+  translateLesson();
   silenceStardust();
 }
 
 document.addEventListener("keydown", handleKeyDown);
 document.getElementById("reset").addEventListener("click", confirmAndResetGame);
 document.getElementById("lang").addEventListener("click", switchLanguage);
+// The lesson covers the game, so it has its own language button
+document.getElementById("lesson-lang").addEventListener("click", switchLanguage);
 document.getElementById("how-to-play").addEventListener("click", showLesson);
 
 // ---------- Start ----------

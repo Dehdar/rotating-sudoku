@@ -9,6 +9,11 @@ public class GrowingBoardsTests : SudokuTest
     private const string ThinLine = "1px";
     private const int LastFourByFourLevel = 5;
     private const int FirstSixBySixLevel = 6;
+    private const int PhoneWidth = 375;
+    private const int PhoneHeight = 812;
+    private const int LaptopWidth = 800;
+    private const int LaptopHeight = 609;
+    private const float SmallestNineByNineCellOnAPhone = 39;
 
     private static readonly SavedGame FourByFourLevel = new() { Level = 1, Shape = BoardShape.FourByFour };
     private static readonly SavedGame SixBySixLevel = new() { Level = FirstSixBySixLevel, Shape = BoardShape.SixBySix };
@@ -89,5 +94,27 @@ public class GrowingBoardsTests : SudokuTest
         await Game.Button("Next level").ClickAsync();
 
         await Expect(Game.Cells).ToHaveCountAsync(BoardShape.SixBySix.CellCount);
+    }
+
+    [Test]
+    public async Task NineByNineCellsUseNearlyTheWholePhoneWidth()
+    {
+        await Game.ResizeWindowAsync(PhoneWidth, PhoneHeight);
+
+        await Game.OpenAsync(new SavedGame());
+
+        var cell = await Game.CellAt(Cell.TopLeft).BoundingBoxAsync();
+        Assert.That(cell!.Width, Is.GreaterThanOrEqualTo(SmallestNineByNineCellOnAPhone));
+    }
+
+    [Test]
+    public async Task ThePictureButtonsFitInAShortLaptopWindow()
+    {
+        await Game.ResizeWindowAsync(LaptopWidth, LaptopHeight);
+
+        await Game.OpenAsync(FourByFourLevel);
+
+        await Expect(Game.PictureButton("Heart")).ToBeInViewportAsync(new() { Ratio = 1 });
+        await Expect(Game.Button("Erase")).ToBeInViewportAsync(new() { Ratio = 1 });
     }
 }

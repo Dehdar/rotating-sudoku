@@ -13,7 +13,8 @@
   --same: #ffe3f1;
   --given-tile: #ece2ff;
   --given-edge: #a38bd6;
-  --oops: #c2410c;
+  /* Plum, not orange or red, so a clash never reads as an error mark */
+  --oops: #7e22ce;
   --accent: #8b5cf6;
   --accent-ink: #ffffff;
   --overlay: rgba(59, 42, 90, 0.55);
@@ -60,12 +61,12 @@
     --muted: #b3a9d6;
     --line: #343a78;
     --line-strong: #c9b8ff;
-    --selected: #6b5a1e;
+    --selected: #5f47a8;
     --related: #252b63;
     --same: #4a2350;
     --given-tile: #2e3576;
     --given-edge: #8f81e0;
-    --oops: #fdba74;
+    --oops: #e9a6f5;
     --accent: #a78bfa;
     --accent-ink: #1a1440;
     --overlay: rgba(5, 7, 25, 0.7);
@@ -116,6 +117,8 @@ main {
   flex-direction: column;
   align-items: center;
   gap: 20px;
+  /* A twirling board pokes out sideways mid-turn; clipping here keeps the page from scrolling */
+  overflow-x: clip;
 }
 
 h1 {
@@ -244,6 +247,11 @@ h1 {
   animation: wobble 0.5s ease-in-out;
 }
 
+@keyframes oops-flash {
+  0%, 60% { box-shadow: inset 0 0 0 4px var(--oops); }
+  100% { box-shadow: inset 0 0 0 4px transparent; }
+}
+
 @keyframes wobble {
   0%, 100% { translate: 0; }
   20% { translate: -8% 0; }
@@ -353,8 +361,15 @@ h1 {
   color: var(--muted);
 }
 
+/* Short windows shrink the lesson board, so the picture buttons stay on screen */
 .lesson-board {
-  width: 100%;
+  width: min(100%, calc(100dvh - 300px));
+}
+
+.lesson-lang {
+  align-self: flex-end;
+  padding: 4px 12px;
+  font-size: 0.85rem;
 }
 
 /* The row, column and box around the empty cell glow, to show where each picture may go only once */
@@ -612,8 +627,13 @@ header {
 @media (prefers-reduced-motion: reduce) {
   .s-bob, .s-tilt, .s-jump, .s-sway, .s-wiggle, .s-twinkle, .s-sparkle, .s-float, .s-puff,
   #mascot-bubble.pop,
-  .cell.swept, #sweep-banner.show, #board.twirl-soon, .cell.wobble span {
+  .cell.swept, #sweep-banner.show, #board.twirl-soon {
     animation: none;
+  }
+
+  /* Without the wobble, a wrong picture still gets a brief plum ring, which does not move */
+  .cell.wobble span {
+    animation: oops-flash 0.9s ease-out;
   }
 
   /* The board fades into its new position instead of spinning */
@@ -629,4 +649,59 @@ header {
 @keyframes twirl-fade {
   0% { opacity: 0.2; }
   100% { opacity: 1; }
+}
+
+/* Phones: every pixel goes to the board, so the 9x9 cells stay as big as possible */
+@media (max-width: 480px) {
+  main {
+    padding: 12px 6px 32px;
+  }
+}
+
+/* Wide but short windows, like a laptop: the board sits on the left and Stardust and the
+   picture buttons on the right, so everything fits without scrolling */
+@media (min-width: 700px) and (max-height: 820px) {
+  main {
+    max-width: 960px;
+    padding-top: 12px;
+    display: grid;
+    grid-template-columns: auto minmax(260px, 340px);
+    grid-template-areas:
+      "header header"
+      "board mascot"
+      "board numpad"
+      "board reset";
+    grid-template-rows: auto auto auto 1fr;
+    align-items: start;
+    justify-content: center;
+    column-gap: 28px;
+    row-gap: 16px;
+  }
+
+  header {
+    grid-area: header;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  header h1 {
+    margin: 0;
+  }
+
+  header .topbar {
+    order: 1;
+    margin: 0 0 0 auto;
+  }
+
+  #mascot { grid-area: mascot; width: 100%; }
+  #numpad { grid-area: numpad; width: 100%; }
+  #reset { grid-area: reset; justify-self: start; }
+
+  /* The header row and the page padding take about 110px of the height */
+  .board-wrap {
+    grid-area: board;
+    width: min(var(--content-width), calc(100dvh - 110px));
+  }
 }

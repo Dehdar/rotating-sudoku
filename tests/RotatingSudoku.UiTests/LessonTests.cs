@@ -122,4 +122,27 @@ public class LessonTests : SudokuTest
 
         await Expect(Game.Lesson).ToBeHiddenAsync();
     }
+
+    // The game behind the lesson is inert, so the lesson has its own language button
+    [Test]
+    public async Task TheLessonCanBeSwitchedToDanish()
+    {
+        await Game.OpenNewGameAsync();
+
+        await Game.LessonButton("Dansk").ClickAsync();
+
+        await Expect(Game.LessonButton("Spring over")).ToBeVisibleAsync();
+        await Expect(Game.LessonButton("Hjerte")).ToBeVisibleAsync();
+    }
+
+    [Test]
+    public async Task AWrongPictureInTheLessonIsMarkedWithoutMotionUnderReducedMotion()
+    {
+        await Game.UseReducedMotionAsync();
+        await Game.OpenNewGameAsync();
+
+        await Game.LessonButton("Star").ClickAsync();
+
+        await Expect(Game.LessonEmptyCells.Locator("span")).ToHaveCSSAsync("animation-name", "oops-flash");
+    }
 }

@@ -8,6 +8,10 @@ public class TwirlTests : SudokuTest
     private const int FirstTwirlingLevel = 3;
     private const int TwirlEveryOnLevelThree = 3;
     private const string NoGlow = "none";
+    private const int LastCastleLevel = 15;
+    private const int PhoneWidth = 375;
+    private const int PhoneHeight = 812;
+    private const int PartwayThroughTheTurnMs = 400;
 
     // A quarter turn clockwise: cos(90°) is almost 0, sin(90°) is 1
     private static readonly Regex QuarterTurn = new(@"^matrix\([^,]+, 1, -1, [^,]+, 0, 0\)$");
@@ -98,11 +102,38 @@ public class TwirlTests : SudokuTest
         await Expect(Game.Board).ToHaveCSSAsync("transform", QuarterTurn);
     }
 
-    private async Task FillCorrectlyAsync(int count)
+    // A board turned partway sticks out past its frame; the page must still not scroll sideways
+    [Test]
+    public async Task ATwirlNeverMakesThePageScrollSideways()
+    {
+        await Game.ResizeWindowAsync(PhoneWidth, PhoneHeight);
+        await Game.OpenAsync(LevelThree);
+        await FillCorrectlyAsync(TwirlEveryOnLevelThree);
+
+        await Game.FreezeTheTwirlPartwayAsync(PartwayThroughTheTurnMs);
+
+        Assert.That(await Game.PageScrollsSidewaysAsync(), Is.False);
+    }
+
+    // The castle's last level used to twirl after every two pictures, about ten turns in one level
+    [Test]
+    public async Task TheCastlesLastLevelDoesNotTwirlAfterTwoPictures()
+    {
+        await Game.OpenAsync(new SavedGame { Level = LastCastleLevel, Shape = BoardShape.SixBySix, EmptyCells = Diagonal });
+
+        await FillCorrectlyAsync(2, BoardShape.SixBySix);
+        await Game.WaitForTheBoardToStopTurningAsync();
+
+        await Expect(Game.Board).ToHaveCSSAsync("transform", NoTurn);
+    }
+
+    private async Task FillCorrectlyAsync(int count) => await FillCorrectlyAsync(count, BoardShape.FourByFour);
+
+    private async Task FillCorrectlyAsync(int count, BoardShape shape)
     {
         foreach (var cell in Diagonal.Take(count))
         {
-            await Game.EnterDigitAsync(cell, BoardShape.FourByFour.SolutionAt(cell));
+            await Game.EnterDigitAsync(cell, shape.SolutionAt(cell));
         }
     }
 

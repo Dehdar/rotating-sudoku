@@ -6,7 +6,7 @@ A calm picture sudoku for children aged 6–12. The board grows from 4x4 to 9x9,
 
 ## Rules
 
-- **A first lesson, learnt by playing:** on a first visit, two tiny 4x4 boards show that each picture goes once in every row, column and box (the row, column and box around the empty cell light up). It can be skipped, is never scored, and can be played again from the **?** button.
+- **A first lesson, learnt by playing:** on a first visit, two tiny 4x4 boards show that each picture goes once in every row, column and box (the row, column and box around the empty cell light up). It can be skipped, is never scored, has its own language button, and can be played again from the **?** button.
 - **No timer and no game over.** Take as long as you like; a level only ends when you solve it.
 - **Pictures instead of numbers:** heart, star, moon and flower on 4x4 boards; raindrop and crown join on 6x6; gem, rainbow and unicorn complete the nine on 9x9. Every picture has its own shape, so the game works without telling colours apart. Each picture goes once in every row, column and box.
 - **The board grows with you** over 20 levels: 4x4 on levels 1–5, 6x6 (boxes two rows tall and three columns wide) on levels 6–15, and the classic 9x9 on levels 16–20. Within each size the levels give fewer pictures as you go.
@@ -14,7 +14,7 @@ A calm picture sudoku for children aged 6–12. The board grows from 4x4 to 9x9,
 - Finishing a level earns **stars**: one for finishing, and a second "careful" star if you made 2 oopsies or fewer (an oops is a picture that is not the right answer, even if you fix it later). Replaying a level can earn more stars but never takes any away.
 - Your game and your stars are saved in the browser, so you continue where you left off. The **Reset game** button starts over from level 1 and keeps your stars.
 - From level 3 the board does a **twirl**: after every few correct pictures it turns a quarter turn clockwise. The pictures stay upright. The board glows when one more correct picture will twirl it. Levels 1 and 2 never twirl, and wrong pictures do not count towards a twirl.
-- Two of the same picture in a row, column or box get a dotted ring, and a picture that is not the right answer gives a little wobble.
+- Two of the same picture in a row, column or box get a dotted plum ring, and a picture that is not the right answer gives a little wobble (with reduced motion: a brief ring instead).
 - Fill in a whole row, column or box correctly and it lights up with a **sweep**. The banner names lines the way you see them, so on a board turned on its side a row is called a column.
 - **Stardust**, a young unicorn who is still learning magic, keeps you company. She cheers when you work something out, comforts you after a mistake, and blames her own wobbly spells when the board twirls.
 - Available in English and Danish (toggle in the game).

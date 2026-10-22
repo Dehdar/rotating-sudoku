@@ -71,4 +71,17 @@ public class EnteringDigitsTests : SudokuTest
         await Expect(Game.CellAt(Cell.TopLeft)).ToHaveCSSAsync("outline-style", "dotted");
         await Expect(Game.CellAt(Cell.NextToTopLeft)).ToHaveCSSAsync("outline-style", "dotted");
     }
+
+    // With reduced motion there is no wobble, so a wrong picture gets a ring that does not move
+    [Test]
+    public async Task AWrongPictureIsMarkedWithoutMotionUnderReducedMotion()
+    {
+        await Game.UseReducedMotionAsync();
+        await Game.OpenAsync(new SavedGame());
+        var wrongDigit = SavedGame.WrongDigitsAt(Cell.TopLeft).First();
+
+        await Game.EnterDigitAsync(Cell.TopLeft, wrongDigit);
+
+        await Expect(Game.PictureAt(Cell.TopLeft)).ToHaveCSSAsync("animation-name", "oops-flash");
+    }
 }

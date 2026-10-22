@@ -8,6 +8,7 @@ const RESTING_MOOD = "happy";
 
 // Events that happen so often that she only comments on some of them
 const FREQUENT_EVENTS = ["select", "right", "rotate"];
+const GAME_START_EVENTS = ["start", "resume"];
 const GAME_OVER_EVENTS = ["won", "finished"];
 
 // The board shows pictures, so no line mentions numbers
@@ -19,6 +20,13 @@ const LINES = {
       "Jeg har pudset mit horn til den her. Klar, når du er!",
       "Lad os finde ud af, hvor hvert billede bor.",
       "Jeg prøvede at trylle den løst. Den blev til suppe. Din tur!",
+    ],
+    resume: [
+      "Nej, hej! Billederne er lige der, hvor du forlod dem.",
+      "Tilbage til vores opgave! Jeg passede godt på hvert felt.",
+      "Klar til at fortsætte? Jeg nøs kun glimmer på den én gang.",
+      "Her er brættet, ligesom før. Hvor skal vi kigge?",
+      "Lad os fortsætte, hvor vi slap.",
     ],
     select: [
       "Hmm, den der? Lad os kigge på rækken.",
@@ -80,6 +88,13 @@ const LINES = {
       "Let's find where every picture lives.",
       "I tried to solve this with magic. It turned into soup. Your turn!",
     ],
+    resume: [
+      "Oh hello! Your pictures are right where you left them.",
+      "Back to our puzzle! I kept every square safe.",
+      "Ready to carry on? I only sneezed glitter on it once.",
+      "Here's the board, just like before. Where shall we look?",
+      "Let's pick up where we stopped.",
+    ],
     select: [
       "Hmm, that one? Let's look at its row.",
       "Good spot. What's missing in that box?",
@@ -136,7 +151,7 @@ const LINES = {
 
 // Which face belongs to which event
 const MOODS = {
-  start: RESTING_MOOD,
+  start: RESTING_MOOD, resume: RESTING_MOOD,
   select: "thinking",
   right: "celebrating", sweep: "celebrating", won: "celebrating", finished: "celebrating",
   wrong: "comforting", erase: "comforting",
@@ -156,7 +171,7 @@ function stardust(event) {
 }
 
 function trackGameProgress(event) {
-  if (event === "start") isGameRunning = true;
+  if (GAME_START_EVENTS.includes(event)) isGameRunning = true;
   if (GAME_OVER_EVENTS.includes(event)) isGameRunning = false;
 }
 

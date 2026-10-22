@@ -15,6 +15,7 @@ internal sealed class SudokuPage(IPage page)
 
     public ILocator Cells => page.GetByTestId("cell");
     public ILocator CellAt(Cell cell) => Cells.Nth(shape.IndexOf(cell));
+    public ILocator PictureAt(Cell cell) => CellAt(cell).Locator("span");
     public ILocator Heading(string name) => page.GetByRole(AriaRole.Heading, new() { Name = name, Exact = true });
     public ILocator Button(string name) => page.GetByRole(AriaRole.Button, new() { Name = name, Exact = true });
     public ILocator Text(string text) => page.GetByText(text, new() { Exact = true });
@@ -26,7 +27,8 @@ internal sealed class SudokuPage(IPage page)
     // The row of picture buttons under the board, in either language
     private ILocator Pictures => page.GetByRole(AriaRole.Group, new() { NameRegex = new Regex("^(Pictures|Billeder)$") });
 
-    public ILocator Lesson => page.GetByRole(AriaRole.Dialog, new() { Name = "How to play", Exact = true });
+    // In either language, since the lesson has its own language button
+    public ILocator Lesson => page.GetByRole(AriaRole.Dialog, new() { NameRegex = new Regex("^(How to play|Sådan spiller du)$") });
     public ILocator LessonButton(string name) => Lesson.GetByRole(AriaRole.Button, new() { Name = name, Exact = true });
     public ILocator LessonEmptyCells => Lesson.GetByRole(AriaRole.Img, new() { Name = Symbols.EmptyCell, Exact = true });
 
@@ -45,6 +47,19 @@ internal sealed class SudokuPage(IPage page)
     }
 
     public async Task ReloadAsync() => await page.ReloadAsync();
+
+    public async Task UseReducedMotionAsync() => await page.EmulateMediaAsync(new() { ReducedMotion = ReducedMotion.Reduce });
+
+    public async Task ResizeWindowAsync(int width, int height) => await page.SetViewportSizeAsync(width, height);
+
+    // Transitions run on real time, so the turn is frozen partway to look at it mid-twirl
+    public async Task FreezeTheTwirlPartwayAsync(int milliseconds) =>
+        await Board.EvaluateAsync(
+            "(board, milliseconds) => board.getAnimations().forEach((animation) => { animation.pause(); animation.currentTime = milliseconds; })",
+            milliseconds);
+
+    public async Task<bool> PageScrollsSidewaysAsync() =>
+        await page.EvaluateAsync<bool>("() => document.documentElement.scrollWidth > document.documentElement.clientWidth");
 
     // Lets a test pick what Math.random returns, for behaviour that only happens by chance
     public async Task FixRandomAsync(double value) =>

@@ -25,6 +25,13 @@ function openLesson(onClose) {
   startLessonStep(0);
 }
 
+// The pictures' names are read aloud, so they follow a language switch during the lesson
+function translateLesson() {
+  if (!isLessonOpen()) return;
+  createLessonPictureButtons();
+  renderLesson();
+}
+
 function isLessonOpen() {
   return !lessonEl.hidden;
 }
